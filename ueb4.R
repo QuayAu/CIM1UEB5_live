@@ -22,7 +22,7 @@ library(batchtools)
 
 reg = makeRegistry(file.dir = NA, seed = 1)
 
-batchMap(fun = monte_carlo, n = rep(10^6, 100), more.args = list(f = f))
+batchMap(fun = monte_carlo, n = rep(10^7, 100), more.args = list(f = f))
 
 # submitJobs()
 # 
