@@ -1,0 +1,44 @@
+<<child='epr_ueb_a_5.Rnw'>>=
+@
+<<eval = TRUE, echo = TRUE, message = FALSE>>=
+set.seed(1)
+maxit = 10^4
+control = list(maxit = maxit, reltol = .Machine$double.xmin)
+p = function() runif(1, min = -5, max = 5)
+optim.nelder = function(data, ...) {
+  optim(c(p(), p()), fn = data, method = "Nelder-Mead", control = control)
+  return(getLoggedValues(data))
+}
+optim.bfgs = function(data, ...) {
+  optim(c(p(), p()), fn = data, method = "BFGS", control = control)
+  return(getLoggedValues(data))
+}
+optim.sann = function(data, ...) {
+  optim(c(p(), p()), fn = data, method = "SANN", control = control)
+  return(getLoggedValues(data))
+}
+
+library(batchtools)
+reg = makeExperimentRegistry()
+
+batchtools::addProblem(name = "rosenbrock", data = rosenbrock)
+batchtools::addProblem(name = "booth", data = booth)
+
+batchtools::addAlgorithm("nelder", fun = function(job, data, instance) optim.nelder(data))
+batchtools::addAlgorithm("bfgs", fun = function(job, data, instance) optim.bfgs(data))
+batchtools::addAlgorithm("sann", fun = function(job, data, instance) optim.sann(data))
+
+#addExperiments(repls = 30)
+addExperiments(repls = 3) #nur für Erstellung der Lösung auf 3 gesetzt. Für die eigentliche Lösung repls = 30
+submitJobs()
+
+res = reduceResultsDataTable(fun = function(x) ifelse(length(x$obj.vals) > 100, x$obj.vals[100], x$obj.vals[length(x$obj.vals)]))
+res$result = unlist(res$result)
+res2 = getJobPars()[res]
+
+library(ggplot2)
+ggplot(data = res2) +
+  geom_boxplot(aes(x = algorithm, y = result, fill = problem))
+@
+
+
