@@ -1,7 +1,3 @@
-<<child='epr_ueb_a_5.Rnw'>>=
-@
-<<eval = TRUE, echo = TRUE, message = FALSE>>=
-
 library(smoof)
 rosenbrock = makeRosenbrockFunction(dimensions = 2L)
 rosenbrock = addLoggingWrapper(rosenbrock, logg.x = TRUE, logg.y = TRUE)
@@ -38,18 +34,6 @@ batchtools::addAlgorithm("nelder", fun = function(job, data, instance) optim.nel
 batchtools::addAlgorithm("bfgs", fun = function(job, data, instance) optim.bfgs(data))
 batchtools::addAlgorithm("sann", fun = function(job, data, instance) optim.sann(data))
 
-#addExperiments(repls = 30)
-addExperiments(repls = 3) #nur für Erstellung der Lösung auf 3 gesetzt. Für die eigentliche Lösung repls = 30
-
-#submitJobs() #Kommentar wegnehmen und ausführen!
-
-res = reduceResultsDataTable(fun = function(x) ifelse(length(x$obj.vals) > 100, x$obj.vals[100], x$obj.vals[length(x$obj.vals)]))
-#res$result = unlist(res$result)
-res2 = getJobPars()[res]
-
-library(ggplot2)
-ggplot(data = res2) +
-  geom_boxplot(aes(x = algorithm, y = V1, fill = problem))
-@
+addExperiments(repls = 30)
 
 
